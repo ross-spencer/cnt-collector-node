@@ -14,7 +14,7 @@ import time_machine
 
 from src.cnt_collector_node import config
 from src.cnt_collector_node import global_helpers as helpers
-from src.cnt_collector_node import utxo_objects
+from src.cnt_collector_node import load_pairs, utxo_objects
 from src.cnt_collector_node.database_initialization import _create_database
 from src.cnt_collector_node.helper_functions import (
     _validate_min_ada,
@@ -1661,6 +1661,7 @@ async def test_check_tokens_pair(
         app_context=app_context,
         identity=test_node_id,
         tokens_pair=tokens_pair,
+        pairs=load_pairs.Pairs({}, "12345"),
     )
     assert message == expected_message
     assert dt == expected_dt

@@ -1,5 +1,6 @@
 """Helper module for loading DEX pairs."""
 
+import hashlib
 import importlib
 import importlib.util
 import logging
@@ -16,6 +17,7 @@ class Pairs:
     """
 
     pairs: dict
+    checksum: str
 
     @property
     def DEX_PAIRS(self):  # pylint:disable=C0103
@@ -42,7 +44,20 @@ def load(path: str) -> Pairs:
         logger.error("problem loading module: %s", err)
         raise SystemExit from err
     try:
-        return Pairs(pairs=pairs.DEX_PAIRS)
+        checksum = get_file_checksum(path=path)
+        return Pairs(pairs=pairs.DEX_PAIRS, checksum=checksum)
     except AttributeError as err:
         logger.error("pairs module doesn't contain DEX_PAIRS dict")
         raise SystemExit from err
+
+
+def get_file_checksum(path: str):
+    """Return a checksum for a file."""
+    checksum = None
+    # Open,close, read file and calculate MD5 on its contents
+    with open(path, "rb") as file_to_check:
+        # read contents of the file
+        data = file_to_check.read()
+        # pipe contents of the file through
+        checksum = hashlib.md5(data).hexdigest()
+    return checksum

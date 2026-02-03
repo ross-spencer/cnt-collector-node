@@ -23,12 +23,13 @@ import certifi
 # Local imports
 try:
     import config
+    import load_pairs
     import utxo_objects
 except ModuleNotFoundError:
     try:
-        from src.cnt_collector_node import config, utxo_objects
+        from src.cnt_collector_node import config, load_pairs, utxo_objects
     except ModuleNotFoundError:
-        from cnt_collector_node import config, utxo_objects
+        from cnt_collector_node import config, load_pairs, utxo_objects
 
 
 class NodeError(Exception):
@@ -217,7 +218,7 @@ def _return_ca_ssl_context():
     return ssl.create_default_context(cafile=certifi.where())
 
 
-def get_version():
+def get_version(pairs: load_pairs.Pairs = None):
     """Return package version to the calling code.
 
     Version is set to a default value if it isn't picked up by importlib
@@ -230,12 +231,12 @@ def get_version():
     except PackageNotFoundError:
         # package is not installed
         pass
-    return __version__
+    return f"cnt-collector-node: {__version__}; pairs-file: {pairs.checksum};"
 
 
-def get_user_agent() -> str:
+def get_user_agent(pairs: load_pairs.Pairs) -> str:
     """Return a user agent to connect to a validator node with."""
-    return f"cnt-collector-node/{get_version()}"
+    return f"cnt-collector-node/{get_version(pairs)}"
 
 
 async def generate_content_signature(

@@ -16,6 +16,7 @@ try:
     import config
     import database_abstraction as dba
     import database_initialization
+    import global_helpers
     import global_helpers as helpers
     import helper_functions
     import kupo_helper
@@ -26,6 +27,7 @@ except ModuleNotFoundError:
         from src.cnt_collector_node import config
         from src.cnt_collector_node import database_abstraction as dba
         from src.cnt_collector_node import database_initialization
+        from src.cnt_collector_node import global_helpers
         from src.cnt_collector_node import global_helpers as helpers
         from src.cnt_collector_node import (
             helper_functions,
@@ -37,6 +39,7 @@ except ModuleNotFoundError:
         from cnt_collector_node import config
         from cnt_collector_node import database_abstraction as dba
         from cnt_collector_node import database_initialization
+        from cnt_collector_node import global_helpers
         from cnt_collector_node import global_helpers as helpers
         from cnt_collector_node import (
             helper_functions,
@@ -127,6 +130,7 @@ async def process_dex_pairs(
                 app_context=app_context,
                 identity=identity,
                 tokens_pair=tokens_pair,
+                pairs=pairs,
             )
         except sqlite3.OperationalError as err:
             logger.error("database query error: %s", err)
@@ -304,17 +308,14 @@ def main() -> None:
         args.print_help()
         sys.exit()
 
-    if args.version:
-        print(helper_functions.get_version())
-        sys.exit(0)
-
     # Setup global logging.
     helpers.setup_logging(args.debug)
 
     pairs = load_pairs.load(path=args.pairs)
 
-    # Setup global logging.
-    helpers.setup_logging(args.debug)
+    if args.version:
+        print(global_helpers.get_version(pairs))
+        sys.exit(0)
 
     asyncio.run(
         cnt_main(
