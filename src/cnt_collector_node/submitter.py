@@ -305,7 +305,7 @@ def main() -> None:
         sys.exit()
 
     if args.version:
-        print(helper_functions.get_version())
+        print(helpers.get_version())
         sys.exit(0)
 
     # Setup global logging.
