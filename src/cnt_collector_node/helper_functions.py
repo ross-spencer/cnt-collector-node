@@ -24,6 +24,7 @@ try:
     import database_initialization
     import global_helpers as helpers
     import kupo_helper
+    import load_pairs
     import ogmios_helper
     import utxo_objects
 except ModuleNotFoundError:
@@ -32,12 +33,22 @@ except ModuleNotFoundError:
         from src.cnt_collector_node import database_abstraction as dba
         from src.cnt_collector_node import database_initialization
         from src.cnt_collector_node import global_helpers as helpers
-        from src.cnt_collector_node import kupo_helper, ogmios_helper, utxo_objects
+        from src.cnt_collector_node import (
+            kupo_helper,
+            load_pairs,
+            ogmios_helper,
+            utxo_objects,
+        )
     except ModuleNotFoundError:
         from cnt_collector_node import config
         from cnt_collector_node import database_abstraction as dba
         from cnt_collector_node import global_helpers as helpers
-        from cnt_collector_node import kupo_helper, ogmios_helper, utxo_objects
+        from cnt_collector_node import (
+            kupo_helper,
+            load_pairs,
+            ogmios_helper,
+            utxo_objects,
+        )
 
 logger = logging.getLogger(__name__)
 
@@ -1172,6 +1183,7 @@ async def _get_source_messages(
     app_context: helpers.AppContext,
     tokens_pair: utxo_objects.TokensPair,
     feed: str,
+    pairs: load_pairs.Pairs,
 ) -> list:
     """Query on-chain for the data we require for each pair at each
     given source.
@@ -1195,7 +1207,7 @@ async def _get_source_messages(
                 security_token_name=source.get("security_token_name"),
                 # Submitter specific. Possibly belongs in InitialContext.
                 address=source.get("address"),
-                collector=helpers.get_user_agent(),
+                collector=helpers.get_user_agent(pairs),
             ),
             last_block_slot=last_block_slot,
         )
@@ -1212,6 +1224,7 @@ async def check_tokens_pair(
     app_context: helpers.AppContext,
     identity: dict,
     tokens_pair: utxo_objects.TokensPair,
+    pairs: load_pairs.Pairs,
 ) -> Union[tuple[dict | str] | tuple[None | str]]:
     """Check a tokens pair"""
     feed = tokens_pair.get("name")
@@ -1219,6 +1232,7 @@ async def check_tokens_pair(
         app_context=app_context,
         tokens_pair=tokens_pair,
         feed=feed,
+        pairs=pairs,
     )
     if not source_messages:
         logger.warning("no source messages for: %s", feed)

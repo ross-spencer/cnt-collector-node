@@ -19,6 +19,7 @@ import websocket
 try:
     import config
     import database_initialization
+    import global_helpers
     import global_helpers as helpers
     import helper_functions
     import kupo_helper
@@ -27,6 +28,7 @@ try:
 except ModuleNotFoundError:
     try:
         from src.cnt_collector_node import config, database_initialization
+        from src.cnt_collector_node import global_helpers
         from src.cnt_collector_node import global_helpers as helpers
         from src.cnt_collector_node import (
             helper_functions,
@@ -36,6 +38,7 @@ except ModuleNotFoundError:
         )
     except ModuleNotFoundError:
         from cnt_collector_node import config, database_initialization
+        from cnt_collector_node import global_helpers
         from cnt_collector_node import global_helpers as helpers
         from cnt_collector_node import (
             helper_functions,
@@ -209,12 +212,14 @@ def main() -> None:
     """Primary entry point for this script."""
     args = parse_arguments()
 
-    if args.version:
-        print(helper_functions.get_version())
-        sys.exit(0)
-
     # Setup global logging.
     helpers.setup_logging(args.debug)
+
+    pairs = load_pairs.load(path=args.pairs)
+
+    if args.version:
+        print(global_helpers.get_version(pairs))
+        sys.exit(0)
 
     if not args.ogmios_url:
         logger.error(
@@ -231,8 +236,6 @@ def main() -> None:
         kupo_url = ""
     else:
         kupo_url = args.kupo_url.rstrip("/")
-
-    pairs = load_pairs.load(path=args.pairs)
 
     try:
         asyncio.run(
