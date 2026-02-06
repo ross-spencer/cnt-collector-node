@@ -1,0 +1,14 @@
+# requirements to run locally and for development.
+-r requirements.txt
+
+deepdiff==8.6.1
+pre-commit==3.7.1
+pip-upgrader==1.4.15
+pylint==3.3.9
+pytest==8.4.2
+pytest-asyncio==1.2.0
+pytest-cov==7.0.0
+pytest-mock==3.15.1
+pytest-random-order==1.2.0
+time-machine==2.19.0
+tox==4.30.3
